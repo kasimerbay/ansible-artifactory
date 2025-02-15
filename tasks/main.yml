@@ -25,6 +25,11 @@
   environment:
     - JFROG_HOME: "{{ jfrog_home }}"
 
+- name: Check if Artifactory is installed
+  ansible.builtin.stat:
+    path: "/var/opt/jfrog/artifactory/etc/system.yaml"
+  register: artifactory_installed
+
 - name: Configure Artifactory - PostgreSQL in system.yaml
   ansible.builtin.template:
     src: "system.yaml.j2"
@@ -33,12 +38,15 @@
     group: root
     mode: 0644
     backup: yes
+  when: artifactory_installed.stat.exists
+  register: artifactory_configured
 
 - name: Start Artifactory
   ansible.builtin.service:
     name: artifactory
     state: started
     enabled: yes
+  when: artifactory_configured.changed
 
 # First stop the service and change the filstore path
 

@@ -2,9 +2,9 @@
 ---
 # vars file for artifactory
 application_name: artifactory
-artifactory_version: {{ artifactory_version }}
-postgresql_db_encoding: {{ postgresql_db_encoding }}
-postgresql_db_host: {{ postgresql_db_host }}
-postgresql_db_port: {{ postgresql_db_port }}
-postgresql_db_password: {{ postgresql_db_password }}
-jfrog_home: {{ jfrog_home }}
+artifactory_version: "7.104.6"
+postgresql_db_encoding: "UTF8"
+postgresql_db_host: "localhost"
+postgresql_db_port: "5432"
+postgresql_db_password: "{{ postgresql_db_password }}"
+# jfrog_home: "{{ jfrog_home }}"
