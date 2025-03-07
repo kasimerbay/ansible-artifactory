@@ -50,17 +50,17 @@ shared:
     ## Database Configuration
     database:
     ## To run Artifactory with any database other than PostgreSQL allowNonPostgresql set to true.
-    #   allowNonPostgresql: false
+      allowNonPostgresql: false
 
     ## One of mysql, oracle, mssql, postgresql, mariadb
     ## Default Embedded derby
 
     ## Example for postgresql
-    #   type: postgresql
-    #   driver: org.postgresql.Driver
-    #   url: "jdbc:postgresql://{{ postgresql_db_host }}:{{ postgresql_db_port }}/{{ application_name }}_db"
-    #   username: {{ application_name }}_owner
-    #   password: {{ postgresql_db_password }}
+      type: postgresql
+      driver: org.postgresql.Driver
+      url: "jdbc:postgresql://{{ postgresql_db_host }}:{{ postgresql_db_port }}/{{ application_name }}_db"
+      username: {{ application_name }}_owner
+      password: {{ postgresql_db_password }}
 
 access:
   ## Extra Java options to pass to the JVM. These values add to or override the defaults.

@@ -28,6 +28,6 @@
 <config version="v1">   
        <chain template="file-system"/>
        <provider id="file-system" type="file-system">            <!-- Modify the "file-system" binary provider -->
-               <baseDataDir>appdata/filestore/binaries</baseDataDir>    <!-- Override the <baseDataDir> attribute -->
+               "<baseDataDir>{{ artifactory_binary_path }}</baseDataDir>"    <!-- Override the <baseDataDir> attribute -->
        </provider>
 </config>

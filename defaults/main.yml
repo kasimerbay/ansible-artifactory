@@ -1,0 +1,22 @@
+# application_name: artifactory
+# artifactory_version: 7.104.6
+# artifactory_binary_path: /artifactory_data
+# server_name: artifactory.yourdomain.com
+# artifactory_port: 8081
+
+# # LDAP
+# ldapUrl: <your_ldap_url>
+# manageDN: CN=<yourCN>,OU=<your_service_user>,DC=<yourDC>,DC=local
+# managerPassword: <CNs_ldap_password>
+# searchFilter: <your_search_filter>
+
+# proxy_server_address: <your_proxy_server_address>
+# proxy_port: 8080
+
+# # PostgreSQL
+# postgresql_db_port: 5432
+# postgresql_db_encoding: UTF8
+# postgresql_db_host: localhost
+# postgresql_db_user: "{{ application_name }}_owner"
+# postgresql_db_name: "{{ application_name }}_db"
+# postgresql_db_password: "{{ application_name }}_password"

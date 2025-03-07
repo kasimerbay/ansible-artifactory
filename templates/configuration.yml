@@ -1,0 +1,34 @@
+localRepositories:
+  local-repo-1:
+    type: maven
+    description: Local Repository 1
+
+remoteRepositories:
+  remote-repo-1:
+    type: maven
+    url: https://repo1.maven.org/maven2,
+    description: Remote Repository 1
+    proxy: artfiactory-proxy
+    handleReleases: true
+    handleSnapshots: true
+    blockMismatchingMimeTypes: true
+    listRemoteFolderItems: true
+    xray:   
+      enabled: false
+    bower:
+      bowerRegistryUrl: https://registry.bower.io
+    nuget:
+      downloadContextPath: api/v2/package 
+        v3FeedUrl:"https://api.nuget.org/v3/index.json"
+      feedContextPath: api/v2
+    vcs:
+      git:
+        provider: github
+        downloadUrl: https://github.com/
+      type: git
+
+virtualRepositories:
+  virtual-repo-1:
+    type: maven
+    url: https://repo.jfrog.org/artifactory/api/npm/npm-virtual,
+

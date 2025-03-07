@@ -9,6 +9,27 @@
     - wget
     - bash-completion
 
+- name: Install Firewalld Service
+  ansible.builtin.package:
+    name: firewalld
+    state: present
+  register: firewalld_installed
+
+- name: Start Firewalld Service
+  ansible.builtin.service:
+    name: firewalld
+    state: started
+    enabled: yes
+  register: firewalld_started
+
+- name: Open http and https
+  ansible.builtin.command:
+    cmd: "{{ item }}"
+  loop:
+    - firewall-cmd --permanent --add-port={{ artifactory_port }}/tcp
+    - firewall-cmd --reload
+
+
 - name: Download Artifactory Repository
   ansible.builtin.get_url:
     url: "https://releases.jfrog.io/artifactory/artifactory-pro-rpms/artifactory-pro-rpms.repo"
@@ -17,13 +38,17 @@
     owner: root
     group: root
 
+- name: Add Proxy Config to Artifactory Repository
+  ansible.builtin.lineinfile:
+    path: /etc/yum.repos.d/jfrog-artifactory-pro-rpms.repo
+    line: "proxy={{ proxy_server_address }}"
+    state: present
+
 - name: Install Artifactory
   ansible.builtin.yum:
     name: "jfrog-artifactory-pro-{{ artifactory_version }}"
     state: present
     enablerepo: jfrog-artifactory-pro-rpms
-  environment:
-    - JFROG_HOME: "{{ jfrog_home }}"
 
 - name: Configure Artifactory - PostgreSQL in system.yaml
   ansible.builtin.template:
@@ -34,34 +59,30 @@
     mode: 0644
     backup: yes
 
-- name: Start Artifactory
-  ansible.builtin.service:
-    name: artifactory
-    state: started
-    enabled: yes
-
-# First stop the service and change the filstore path
-
-- name: Stop Artifactory
-  ansible.builtin.service:
-    name: artifactory
-    state: stopped
-
-- name: Create a directory if it does not exist
+- name: Create the filestore path if it does not exists
   ansible.builtin.file:
-    path: /appdata/filestore/binaries
+    path: "{{ artifactory_binary_path }}"
     state: directory
     owner: artifactory
     group: artifactory
-    mode: '0755'
+    mode: 0755
 
-- name: Confiure Artifactory FileStore
+- name: Create filestore for Artifactory to {{ artifactory_binary_path }}
   ansible.builtin.template:
-    src: binarystore.xml.j2
+    src: "binarystore.xml.j2"
     dest: "/var/opt/jfrog/artifactory/etc/artifactory/binarystore.xml"
     owner: root
     group: root
     mode: 0644
+    backup: yes
+
+- name: Configure Artifactory Licence
+  ansible.builtin.template:
+    src: "artifactory.lic.j2"
+    dest: "/var/opt/jfrog/artifactory/etc/artifactory.lic"
+    owner: artifactory
+    group: artifactory
+    mode: 0640
     backup: yes
 
 - name: Start Artifactory
@@ -69,3 +90,40 @@
     name: artifactory
     state: started
     enabled: yes
+
+- name: Print {{ application_name | title }} URL
+  ansible.builtin.debug:
+    msg: "Artifactory URL: http://{{ ansible_ssh_host }}:{{ artifactory_port }}. Login with admin/password"
+
+- name: Wait for Artifactory to start
+  ansible.builtin.wait_for:
+    port: "{{ artifactory_port }}"
+    delay: 10
+    timeout: 300
+
+- name: Configure Artifactory
+  ansible.builtin.template:
+    src: "configuration.yml.j2"
+    dest: "~/configuration.yml"
+    owner: artifactory
+    group: artifactory
+    mode: 0640
+    backup: yes
+
+- name: Configure Artfiactory System
+  ansible.builtin.uri:
+    url: "http://{{ ansible_ssh_host }}:{{ artifactory_port }}/artifactory/api/system/configuration"
+    method: PATCH
+    src: ~/configuration.yml
+    headers:
+      Content-Type: "application/yaml"
+    remote_src: yes
+    url_username: admin
+    url_password: password
+    force_basic_auth: yes
+    validate_certs: no
+  register: result
+
+- name: Print Artifactory Configuration Result
+  ansible.builtin.debug:
+    msg: "{{ result }}"
